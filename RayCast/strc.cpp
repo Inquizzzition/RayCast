@@ -7,6 +7,11 @@ Vec3::Vec3()
 	this->z = 0;
 }
 
+double dot(Vec3 v1, Vec3 v2)
+{
+	return (v1.x*v2.x + v1.y*v2.y + v1.z*v2.z);
+}
+
 Vec3::Vec3(double x, double y, double z)
 {
 	this->x = x;
