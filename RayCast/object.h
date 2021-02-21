@@ -10,9 +10,24 @@ private:
 	Colr colr;
 	double radius;
 public:
+	Sphere(Vec3 c, double r);
 	void set_crd(Vec3 crd);
 	Vec3 get_crd();
 	void set_colr(Colr colr);
+	bool intersect(Ray ray, double& t);
+};
+
+class Ray
+{
+private:
+	Vec3 o;
+	Vec3 d;
+public:
+	Vec3 get_o();
+	Vec3 get_d();
+	void set_o(Vec3 t);
+	void set_d(Vec3 t);
+	Ray(Vec3 a, Vec3 b);
 };
 
 class line {

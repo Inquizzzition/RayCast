@@ -7,6 +7,7 @@
 class Wind {
 private:
 	sf::RenderWindow w;
+	sf::Event event;
 	sf::RectangleShape rs;
 public:
 	Wind();
