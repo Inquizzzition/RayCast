@@ -1,7 +1,7 @@
 #include <SFML/Graphics.hpp>
-#include <fstream>
 #include <cmath>
 #include <iostream>
+
 struct Vec3 {
     double x, y, z;
     Vec3(double x, double y, double z) : x(x), y(y), z(z) {}
@@ -68,7 +68,9 @@ int main() {
     sf::Vertex v;
     sf::RenderWindow w(sf::VideoMode(H, W), "RayCast");
     sf::RectangleShape rs(sf::Vector2f(1, 1));
-
+    sf::VertexArray va(sf::Points, W * H);
+    sf::Image im;
+    im.create(W, H);
     double t;
     Vec3 pix_col(black);
     while (w.isOpen()) {
@@ -94,17 +96,15 @@ int main() {
                     pix_col = (red + white * dt) * 0.5;
                     clamp255(pix_col);
                 }
-                v.color = (sf::Color(pix_col.x, pix_col.y, pix_col.z));
-                v.position = sf::Vector2f(x, y);
-                w.draw(v, 1, sf::Points, sf::RenderStates::Default);
-                w.
+                va[y+x].color = (sf::Color(pix_col.x, pix_col.y, pix_col.z));
+                va[y+x].position = sf::Vector2f(x, y);
+                w.draw(va);
             }
         }
 
         sphere.c.x += 2;
         sphere.c.y += 1;
 
-        std::cout << "TTT ";
         w.display();
         std::cout << "D\n ";
     }
