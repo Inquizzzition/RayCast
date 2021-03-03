@@ -20,7 +20,7 @@ inline double dot(const Vec3& a, const Vec3& b) {
 
 struct Ray {
     Vec3 o, d;
-    Ray(const Vec3& o, const Vec3& d) : o(o), d(d) {}
+    Ray(Vec3 o, Vec3 d) : o(o), d(d) {}
 };
 
 struct Sphere {
@@ -29,9 +29,9 @@ struct Sphere {
     void set_c(Vec3 v) {
 
     };
-    Sphere(const Vec3& c, double r) : c(c), r(r) {}
-    Vec3 getNormal(const Vec3& pi) const { return (pi - c) / r; }
-    bool intersect(const Ray& ray, double& t) const {
+    Sphere(Vec3 c, double r) : c(c), r(r) {}
+    Vec3 getNormal(Vec3 pi) const { return (pi - c) / r; }
+    bool intersect(Ray ray, double& t) const {
         const Vec3 o = ray.o;
         const Vec3 d = ray.d;
         const Vec3 oc = o - c;
@@ -62,8 +62,8 @@ int main() {
     const Vec3 black(0, 0, 0);
     const Vec3 red(255, 0, 0);
 
-    Sphere sphere(Vec3(W * 0.5, H * 0.5, 50), 50);
-    const Sphere light(Vec3(0, 0, 50), 1);
+    Sphere sphere(Vec3( 100, 100, 20), 10);
+    Sphere light(Vec3(0, 0, 50), 1);
     
     sf::Vertex v;
     sf::RenderWindow w(sf::VideoMode(H, W), "RayCast");
@@ -75,6 +75,8 @@ int main() {
     //im.create(W, H, pixels);
     double t;
     Vec3 pix_col(black);
+
+    Vec3 cam(0,0,0);
 
     while (w.isOpen()) {
 
@@ -89,7 +91,7 @@ int main() {
             for (int x = 0; x < W; ++x) {
                 pix_col = black;
 
-                const Ray ray(Vec3(x, y, 0), Vec3(0, 0, 1));
+                const Ray ray(Vec3(cam.x+x,cam.y+y,cam.z), Vec3(0, 0, 1));
                 if (sphere.intersect(ray, t)) {
                     const Vec3 pi = ray.o + ray.d * t;
                     const Vec3 L = light.c - pi;
@@ -105,8 +107,12 @@ int main() {
             }
         }
 
-        sphere.c.x += sin(TIME_UTC)*2;
-        sphere.c.y += sin(TIME_UTC)*2; 
+        if ((sf::Keyboard::isKeyPressed(sf::Keyboard::Left) || (sf::Keyboard::isKeyPressed(sf::Keyboard::A)))) { cam.x += 1; }
+if ((sf::Keyboard::isKeyPressed(sf::Keyboard::Right) || (sf::Keyboard::isKeyPressed(sf::Keyboard::D)))) { cam.x -= 1; }
+if ((sf::Keyboard::isKeyPressed(sf::Keyboard::Up) || (sf::Keyboard::isKeyPressed(sf::Keyboard::W)))) { cam.z -= 1; }
+if ((sf::Keyboard::isKeyPressed(sf::Keyboard::Down) || (sf::Keyboard::isKeyPressed(sf::Keyboard::S)))) { cam.z += 1; }
+        //sphere.c.x += sin(TIME_UTC)*2;
+        //sphere.c.y += sin(TIME_UTC)*2; 
 
         w.draw(va);
         w.display();
