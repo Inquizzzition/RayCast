@@ -55,8 +55,8 @@ void clamp255(Vec3& col) {
 
 int main() {
 
-    const int H = 500;
-    const int W = 500;
+    const int H = 600;
+    const int W = 600;
 
     const Vec3 white(255, 255, 255);
     const Vec3 black(0, 0, 0);
@@ -75,6 +75,7 @@ int main() {
     //im.create(W, H, pixels);
     double t;
     Vec3 pix_col(black);
+
     while (w.isOpen()) {
 
         sf::Event event;
@@ -84,9 +85,8 @@ int main() {
                 w.close();
         }
         w.clear();
-        va.resize(w.getSize().x * w.getSize().y);
-        for (int y = 0; y < w.getSize().y; ++y) {
-            for (int x = 0; x < w.getSize().x; ++x) {
+        for (int y = 0; y < H; ++y) {
+            for (int x = 0; x < W; ++x) {
                 pix_col = black;
 
                 const Ray ray(Vec3(x, y, 0), Vec3(0, 0, 1));
@@ -99,13 +99,13 @@ int main() {
                     pix_col = (red + white * dt) * 0.5;
                     clamp255(pix_col);
                 }
-                va[y*x].color = (sf::Color(pix_col.x, pix_col.y, pix_col.z));
-                va[y*x].position = sf::Vector2f(x, y);
+                va[y*W+x].color = (sf::Color(pix_col.x, pix_col.y, pix_col.z));
+                va[y*W+x].position = sf::Vector2f(x, y);
                 //pixels[x+y]
             }
         }
 
-        sphere.c.x -= sin(TIME_UTC)*2;
+        sphere.c.x += sin(TIME_UTC)*2;
         sphere.c.y += sin(TIME_UTC)*2; 
 
         w.draw(va);
