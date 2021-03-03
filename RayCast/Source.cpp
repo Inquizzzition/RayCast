@@ -67,10 +67,12 @@ int main() {
     
     sf::Vertex v;
     sf::RenderWindow w(sf::VideoMode(H, W), "RayCast");
-    sf::RectangleShape rs(sf::Vector2f(1, 1));
     sf::VertexArray va(sf::Points, W * H);
-    sf::Image im;
-    im.create(W, H);
+    //sf::Uint8* pixels = new sf::Uint8[800 * 600 * 4];
+    //sf::Image im;
+    //sf::Sprite sprite;
+    
+    //im.create(W, H, pixels);
     double t;
     Vec3 pix_col(black);
     while (w.isOpen()) {
@@ -82,6 +84,7 @@ int main() {
                 w.close();
         }
         w.clear();
+        va.resize(w.getSize().x * w.getSize().y);
         for (int y = 0; y < w.getSize().y; ++y) {
             for (int x = 0; x < w.getSize().x; ++x) {
                 pix_col = black;
@@ -96,15 +99,16 @@ int main() {
                     pix_col = (red + white * dt) * 0.5;
                     clamp255(pix_col);
                 }
-                va[y+x].color = (sf::Color(pix_col.x, pix_col.y, pix_col.z));
-                va[y+x].position = sf::Vector2f(x, y);
-                w.draw(va);
+                va[y*x].color = (sf::Color(pix_col.x, pix_col.y, pix_col.z));
+                va[y*x].position = sf::Vector2f(x, y);
+                //pixels[x+y]
             }
         }
 
-        sphere.c.x += 2;
-        sphere.c.y += 1;
+        sphere.c.x -= sin(TIME_UTC)*2;
+        sphere.c.y += sin(TIME_UTC)*2; 
 
+        w.draw(va);
         w.display();
         std::cout << "D\n ";
     }
