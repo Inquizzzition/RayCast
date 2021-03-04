@@ -1,3 +1,4 @@
+
 #include <SFML/Graphics.hpp>
 #include <cmath>
 #include <iostream>
@@ -20,7 +21,7 @@ inline double dot(const Vec3& a, const Vec3& b) {
 
 struct Ray {
     Vec3 o, d;
-    Ray(Vec3 o, Vec3 d) : o(o), d(d) {}
+    Ray(const Vec3& o, const Vec3& d) : o(o), d(d) {}
 };
 
 struct Sphere {
@@ -29,9 +30,9 @@ struct Sphere {
     void set_c(Vec3 v) {
 
     };
-    Sphere(Vec3 c, double r) : c(c), r(r) {}
-    Vec3 getNormal(Vec3 pi) const { return (pi - c) / r; }
-    bool intersect(Ray ray, double& t) const {
+    Sphere(const Vec3& c, double r) : c(c), r(r) {}
+    Vec3 getNormal(const Vec3& pi) const { return (pi - c) / r; }
+    bool intersect(const Ray& ray, double& t) const {
         const Vec3 o = ray.o;
         const Vec3 d = ray.d;
         const Vec3 oc = o - c;
@@ -54,30 +55,25 @@ void clamp255(Vec3& col) {
 }
 
 int main() {
-
-    const int H = 600;
-    const int W = 600;
-
+    
+    int H = 500;
+    int W = 500;
+    
     const Vec3 white(255, 255, 255);
     const Vec3 black(0, 0, 0);
     const Vec3 red(255, 0, 0);
 
-    Sphere sphere(Vec3( 100, 100, 20), 10);
-    Sphere light(Vec3(0, 0, 50), 1);
-    
+    Sphere sphere(Vec3(0, 0, 300), 200);
+    Sphere light(Vec3(-200, -200, 300), 1);
+
     sf::Vertex v;
     sf::RenderWindow w(sf::VideoMode(H, W), "RayCast");
     sf::VertexArray va(sf::Points, W * H);
-    //sf::Uint8* pixels = new sf::Uint8[800 * 600 * 4];
-    //sf::Image im;
-    //sf::Sprite sprite;
-    
-    //im.create(W, H, pixels);
+    double speed = 5;
     double t;
     Vec3 pix_col(black);
-
     Vec3 cam(0,0,0);
-
+    double iter = 0;
     while (w.isOpen()) {
 
         sf::Event event;
@@ -87,33 +83,35 @@ int main() {
                 w.close();
         }
         w.clear();
-        for (int y = 0; y < H; ++y) {
-            for (int x = 0; x < W; ++x) {
+        for (int y = -H/2; y < H/2; ++y) {
+            for (int x =-W/2; x < W/2; ++x) {
                 pix_col = black;
 
-                const Ray ray(Vec3(cam.x+x,cam.y+y,cam.z), Vec3(0, 0, 1));
+                Ray ray(Vec3(cam.x, cam.y, cam.z), Vec3(abs(cam.x)-x,abs(cam.y)-y, abs(cam.z)+50).normalize());
                 if (sphere.intersect(ray, t)) {
-                    const Vec3 pi = ray.o + ray.d * t;
-                    const Vec3 L = light.c - pi;
-                    const Vec3 N = sphere.getNormal(pi);
-                    const double dt = dot(L.normalize(), N.normalize());
+                    Vec3 pi = ray.o + ray.d * t;
+                    Vec3 L = light.c - pi;
+                    Vec3 N = sphere.getNormal(pi);
+                    double dt = dot(L.normalize(), N.normalize());
 
                     pix_col = (red + white * dt) * 0.5;
                     clamp255(pix_col);
                 }
-                va[y*W+x].color = (sf::Color(pix_col.x, pix_col.y, pix_col.z));
-                va[y*W+x].position = sf::Vector2f(x, y);
+                va[(y + H/2) * W + (x + W/2)].color = (sf::Color(pix_col.x, pix_col.y, pix_col.z));
+                va[(y + H/2) * W + (x + W/2)].position = sf::Vector2f(x + W/2, y + H/2);
                 //pixels[x+y]
             }
         }
-
-        if ((sf::Keyboard::isKeyPressed(sf::Keyboard::Left) || (sf::Keyboard::isKeyPressed(sf::Keyboard::A)))) { cam.x += 1; }
-if ((sf::Keyboard::isKeyPressed(sf::Keyboard::Right) || (sf::Keyboard::isKeyPressed(sf::Keyboard::D)))) { cam.x -= 1; }
-if ((sf::Keyboard::isKeyPressed(sf::Keyboard::Up) || (sf::Keyboard::isKeyPressed(sf::Keyboard::W)))) { cam.z -= 1; }
-if ((sf::Keyboard::isKeyPressed(sf::Keyboard::Down) || (sf::Keyboard::isKeyPressed(sf::Keyboard::S)))) { cam.z += 1; }
-        //sphere.c.x += sin(TIME_UTC)*2;
-        //sphere.c.y += sin(TIME_UTC)*2; 
-
+        if ((sf::Keyboard::isKeyPressed(sf::Keyboard::Left) || (sf::Keyboard::isKeyPressed(sf::Keyboard::A)))) { cam.x += speed; }
+        if ((sf::Keyboard::isKeyPressed(sf::Keyboard::Right) || (sf::Keyboard::isKeyPressed(sf::Keyboard::D)))) { cam.x -= speed; }
+        if ((sf::Keyboard::isKeyPressed(sf::Keyboard::Up) || (sf::Keyboard::isKeyPressed(sf::Keyboard::W)))) { cam.z += speed; }
+        if ((sf::Keyboard::isKeyPressed(sf::Keyboard::Down) || (sf::Keyboard::isKeyPressed(sf::Keyboard::S)))) { cam.z -= speed; }
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift)) { cam.y -= speed; }
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space)) { cam.y += speed; }
+        light.c.x += cos(iter) * 50;
+        light.c.y += cos(iter) * 50;
+        light.c.z += cos(iter) * 50;
+        iter += 0.5;
         w.draw(va);
         w.display();
         std::cout << "D\n ";
