@@ -74,6 +74,7 @@ int main() {
     Vec3 pix_col(black);
     Vec3 cam(0,0,0);
     double iter = 0;
+    double dist = 50;
     while (w.isOpen()) {
 
         sf::Event event;
@@ -87,7 +88,7 @@ int main() {
             for (int x =-W/2; x < W/2; ++x) {
                 pix_col = black;
 
-                Ray ray(Vec3(cam.x, cam.y, cam.z), Vec3(abs(cam.x)-x,abs(cam.y)-y, abs(cam.z)+50).normalize());
+                Ray ray(cam, Vec3(abs(cam.x)-x,abs(cam.y)-y, abs(cam.z)+dist).normalize());
                 if (sphere.intersect(ray, t)) {
                     Vec3 pi = ray.o + ray.d * t;
                     Vec3 L = light.c - pi;
@@ -108,10 +109,9 @@ int main() {
         if ((sf::Keyboard::isKeyPressed(sf::Keyboard::Down) || (sf::Keyboard::isKeyPressed(sf::Keyboard::S)))) { cam.z -= speed; }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift)) { cam.y -= speed; }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space)) { cam.y += speed; }
-        light.c.x += cos(iter) * 50;
-        light.c.y += cos(iter) * 50;
-        light.c.z += cos(iter) * 50;
-        iter += 0.5;
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q)) { dist -= 3; }
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::E)) { dist += 3; }
+
         w.draw(va);
         w.display();
         std::cout << "D\n ";
